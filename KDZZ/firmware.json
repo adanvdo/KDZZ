@@ -1,0 +1,74 @@
+﻿{
+
+  "devices": [
+    {
+      "model": "h872",
+      "bootloader": [
+        "aboot",
+        "apdp",
+        "cmnlib",
+        "cmnlib64",
+        "devcfg",
+        "factory",
+        "hyp",
+        "keymaster",
+        "msadp",
+        "pmic",
+        "raw_resources",
+        "rpm",
+        "sec",
+        "tz",
+        "xbl",
+        "xbl2"
+      ],
+      "modem": [
+        "modem",
+        "persist",
+        "rct"
+      ],
+      "primary": [
+        "boot",
+        "system"
+      ],
+      "dlmode_recov": [
+        "laf",
+        "recovery"
+      ]
+    },
+    {
+      "model": "h932",
+      "bootloader": [
+        "abl",
+        "apdp",
+        "cmnlib",
+        "cmnlib64",
+        "devcfg",
+        "factory",
+        "hyp",
+        "keymaster",
+        "logfs",
+        "msadp",
+        "pmic",
+        "raw_resources",
+        "rpm",
+        "sec",
+        "storsec",
+        "tz",
+        "xbl"
+      ],
+      "modem": [
+        "modem",
+        "persist",
+        "rct"
+      ],
+      "primary": [
+        "boot",
+        "system"
+      ],
+      "dlmode_recov": [
+        "laf",
+        "recovery"
+      ]
+    }
+  ]
+}

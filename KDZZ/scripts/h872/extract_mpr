@@ -1,0 +1,3 @@
+package_extract_file("modem.img", "/dev/block/bootdevice/by-name/modem");
+package_extract_file("persist.img", "/dev/block/bootdevice/by-name/persist");
+package_extract_file("rct.img", "/dev/block/bootdevice/by-name/rct");

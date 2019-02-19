@@ -1,0 +1,11 @@
+C:\Users\jesse\source\repos\KDZZ\KDZZ\obj\Debug\KDZZ.csprojAssemblyReference.cache
+C:\Users\jesse\source\repos\KDZZ\KDZZ\obj\Debug\KDZZ.csproj.CoreCompileInputs.cache
+C:\Users\jesse\source\repos\KDZZ\KDZZ\bin\Debug\KDZZ.exe.config
+C:\Users\jesse\source\repos\KDZZ\KDZZ\bin\Debug\KDZZ.exe
+C:\Users\jesse\source\repos\KDZZ\KDZZ\bin\Debug\KDZZ.pdb
+C:\Users\jesse\source\repos\KDZZ\KDZZ\bin\Debug\Newtonsoft.Json.dll
+C:\Users\jesse\source\repos\KDZZ\KDZZ\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\jesse\source\repos\KDZZ\KDZZ\bin\Debug\Newtonsoft.Json.xml
+C:\Users\jesse\source\repos\KDZZ\KDZZ\obj\Debug\KDZZ.csproj.CopyComplete
+C:\Users\jesse\source\repos\KDZZ\KDZZ\obj\Debug\KDZZ.exe
+C:\Users\jesse\source\repos\KDZZ\KDZZ\obj\Debug\KDZZ.pdb
