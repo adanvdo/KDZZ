@@ -99,8 +99,10 @@ namespace KDZZ
                     List<string> bins = new List<string>();
                     bins.AddRange(model.BL);
                     bins.AddRange(model.MPR);
+                    bins.AddRange(model.PRI);
+                    bins.AddRange(model.DLR);
 
-                    binsexist = FileTool.BinsExist(model.BL, binsPath);
+                    binsexist = FileTool.BinsExist(bins, binsPath);
                     Console.WriteLine("    - Bins Exist: " + binsexist.ToString());
                     if (!binsexist)
                     {
@@ -109,12 +111,13 @@ namespace KDZZ
                         if (binres.Choice == 2) { Environment.Exit(0); }
                     }
                 }
-                processBins(projPath, binsPath, useLGFE);
+                processBins(projPath, binsPath, model, useLGFE);
             }
         }
 
-        private static void processBins(string projPath, string binsPath, bool useLGFE)
+        private static void processBins(string projPath, string binsPath, ModelBins modelBins, bool useLGFE)
         {
+            ModelBins binfiles = FileTool.ProcessBins(modelBins, projPath, binsPath, useLGFE);
             Console.ReadKey();
         }
 

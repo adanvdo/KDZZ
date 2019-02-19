@@ -9,3 +9,14 @@ C:\Users\jesse\source\repos\KDZZ\KDZZ\bin\Debug\Newtonsoft.Json.xml
 C:\Users\jesse\source\repos\KDZZ\KDZZ\obj\Debug\KDZZ.csproj.CopyComplete
 C:\Users\jesse\source\repos\KDZZ\KDZZ\obj\Debug\KDZZ.exe
 C:\Users\jesse\source\repos\KDZZ\KDZZ\obj\Debug\KDZZ.pdb
+C:\Users\jesse\kdzz\KDZZ\bin\Debug\KDZZ.exe.config
+C:\Users\jesse\kdzz\KDZZ\bin\Debug\KDZZ.exe
+C:\Users\jesse\kdzz\KDZZ\bin\Debug\KDZZ.pdb
+C:\Users\jesse\kdzz\KDZZ\bin\Debug\Newtonsoft.Json.dll
+C:\Users\jesse\kdzz\KDZZ\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\jesse\kdzz\KDZZ\bin\Debug\Newtonsoft.Json.xml
+C:\Users\jesse\kdzz\KDZZ\obj\Debug\KDZZ.csprojResolveAssemblyReference.cache
+C:\Users\jesse\kdzz\KDZZ\obj\Debug\KDZZ.csproj.CoreCompileInputs.cache
+C:\Users\jesse\kdzz\KDZZ\obj\Debug\KDZZ.csproj.CopyComplete
+C:\Users\jesse\kdzz\KDZZ\obj\Debug\KDZZ.exe
+C:\Users\jesse\kdzz\KDZZ\obj\Debug\KDZZ.pdb

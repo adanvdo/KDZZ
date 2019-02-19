@@ -76,6 +76,10 @@ namespace KDZZ.scripts
         public List<string> MPR { get; set; } 
         public List<string> DLR { get; set; }
         public List<string> PRI { get; set; }
+        public List<string> BLPATHS { get; set; }
+        public List<string> MPRPATHS { get; set; }
+        public List<string> DLRPATHS { get; set; }
+        public List<string> PRIPATHS { get; set; }
 
         public ModelBins(string model)
         {
@@ -83,6 +87,11 @@ namespace KDZZ.scripts
             MPR = new List<string>();
             DLR = new List<string>();
             PRI = new List<string>();
+
+            BLPATHS = new List<string>();
+            MPRPATHS = new List<string>();
+            DLRPATHS = new List<string>();
+            PRIPATHS = new List<string>();
 
             dynamic device = getModel(model);
             if (device == null)
@@ -101,6 +110,16 @@ namespace KDZZ.scripts
                 {
                     string bin = Convert.ToString(obj);
                     MPR.Add(bin);
+                }
+                foreach(var obj in device.primary)
+                {
+                    string image = Convert.ToString(obj);
+                    PRI.Add(image);
+                }
+                foreach(var obj in device.dlmode_recov)
+                {
+                    string bin = Convert.ToString(obj);
+                    DLR.Add(bin);
                 }
             }
         }
