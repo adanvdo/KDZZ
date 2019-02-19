@@ -80,6 +80,7 @@ namespace KDZZ.scripts
         public List<string> MPRPATHS { get; set; }
         public List<string> DLRPATHS { get; set; }
         public List<string> PRIPATHS { get; set; }
+        public int BinCount { get { return (BL.Count + MPR.Count + DLR.Count + PRI.Count); } }
 
         public ModelBins(string model)
         {

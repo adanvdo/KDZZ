@@ -20,3 +20,14 @@ C:\Users\jesse\kdzz\KDZZ\obj\Debug\KDZZ.csproj.CoreCompileInputs.cache
 C:\Users\jesse\kdzz\KDZZ\obj\Debug\KDZZ.csproj.CopyComplete
 C:\Users\jesse\kdzz\KDZZ\obj\Debug\KDZZ.exe
 C:\Users\jesse\kdzz\KDZZ\obj\Debug\KDZZ.pdb
+C:\Users\jam\kdzz\KDZZ\bin\Debug\KDZZ.exe.config
+C:\Users\jam\kdzz\KDZZ\obj\Debug\KDZZ.exe
+C:\Users\jam\kdzz\KDZZ\obj\Debug\KDZZ.pdb
+C:\Users\jam\kdzz\KDZZ\obj\Debug\KDZZ.csprojAssemblyReference.cache
+C:\Users\jam\kdzz\KDZZ\obj\Debug\KDZZ.csproj.CoreCompileInputs.cache
+C:\Users\jam\kdzz\KDZZ\bin\Debug\KDZZ.exe
+C:\Users\jam\kdzz\KDZZ\bin\Debug\KDZZ.pdb
+C:\Users\jam\kdzz\KDZZ\bin\Debug\Newtonsoft.Json.dll
+C:\Users\jam\kdzz\KDZZ\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\jam\kdzz\KDZZ\bin\Debug\Newtonsoft.Json.xml
+C:\Users\jam\kdzz\KDZZ\obj\Debug\KDZZ.csproj.CopyComplete

@@ -22,7 +22,6 @@ namespace KDZZ
             {
                 string projectDir = string.Empty;
                 string binsDir = string.Empty;
-                bool useLGFE = false;
                 for (int i = 0; i < args.Length; i++)
                 {
                     string s = args[i];
@@ -31,7 +30,6 @@ namespace KDZZ
                      * -p   |  project dir
                      * -b   |  extracted bins dir
                      * -r   |  reset
-                     * -X   |  use LGFirmwareExtract dir structure
                      * 
                      * 
                      */
@@ -59,20 +57,16 @@ namespace KDZZ
                             ReturnError(ex.Message);
                         }
                     }
-                    if (s == "-X")
-                    {
-                        useLGFE = true;
-                    }
                 }
                 if (string.IsNullOrEmpty(projectDir))
                 {
                     ReturnError("missing directory argument");
                 }
-                else continueLoading(projectDir, binsDir, useLGFE);
+                else continueLoading(projectDir, binsDir);
             }
         }
 
-        private static void continueLoading(string projPath, string binsPath, bool useLGFE)
+        private static void continueLoading(string projPath, string binsPath)
         {
             if (string.IsNullOrEmpty(binsPath))
             {
@@ -111,17 +105,10 @@ namespace KDZZ
                         if (binres.Choice == 2) { Environment.Exit(0); }
                     }
                 }
-                processBins(projPath, binsPath, model, useLGFE);
+                ModelBins copied = FileTool.ProcessBins(model, projPath, binsPath);
+                Console.ReadKey();
             }
         }
-
-        private static async void processBins(string projPath, string binsPath, ModelBins modelBins, bool useLGFE)
-        {
-            ModelBins binfiles = await FileTool.ProcessBins(modelBins, projPath, binsPath, useLGFE);
-            Console.ReadKey();
-        }
-
-
 
         public static void ReturnError(string message)
         {

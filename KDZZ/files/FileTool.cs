@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace KDZZ
@@ -75,70 +73,61 @@ namespace KDZZ
             return true;
         }
 
-        public static async Task<scripts.ModelBins> ProcessBins(KDZZ.scripts.ModelBins modelBins, string projPath, string binsPath, bool useLGFE)
+        public static scripts.ModelBins ProcessBins(KDZZ.scripts.ModelBins modelBins, string projPath, string binsPath)
         {
             DirectoryInfo p = new DirectoryInfo(projPath);
             DirectoryInfo b = new DirectoryInfo(binsPath);
             List<FileInfo> bins = getFiles(b);
-            return await ProcessDirectories(p.FullName, modelBins, bins);
+            return ProcessDirectories(p.FullName, modelBins, bins);
         }
 
         public static FileInfo findByName(string binname, List<FileInfo> bins)
         {
             foreach(FileInfo f in bins)
             {
-                if (f.Name.Contains(binname))
+                if (binname == "system" && f.Name.Contains(binname))
+                    return f;
+                else if (f.Name.Contains(binname+"_"))
                     return f;
             }
             return null;
         }
 
-        private static async Task<bool> copyFileAsync(string filepath, string targetpath)
+        private static void displayProgress(string message, string file, string progressmessage)
         {
-            try
-            {
-                using (Stream source = File.Open(filepath, FileMode.Open))
-                {
-                    using (Stream destination = File.Create(targetpath))
-                    {
-                        await source.CopyToAsync(destination);
-                    }
-                }
-                return true;
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex);
-                return false;
-            }
+            Console.Write("\r{0} {1} - {2}", message, file, progressmessage);
         }
 
-
-        private static async Task<scripts.ModelBins> ProcessDirectories(string projPath, scripts.ModelBins modelBins, List<FileInfo> bins)
-        {            
+        private static scripts.ModelBins ProcessDirectories(string projPath, scripts.ModelBins modelBins, List<FileInfo> bins)
+        {
+            int bincount = modelBins.BinCount;
+            int filecount = bins.Count;
+            int processcount = 0;
+            int copycount = 0;
+            string msg = "    - Processing File ";
 
             if(!Directory.Exists(Path.Combine(projPath, "bootloader")))
                 Directory.CreateDirectory(Path.Combine(projPath, "bootloader"));            
-            foreach(string s in modelBins.BL)
+            for(int i = modelBins.BL.Count-1; i >= 0; i--) //each(string s in modelBins.BL)
             {
+                string s = modelBins.BL[i];
                 FileInfo f = findByName(s, bins);
                 string tgt = Path.Combine(projPath, "bootloader", s + ".img");
                 modelBins.BLPATHS.Add(tgt);
-                bool copied = await copyFileAsync(f.FullName, tgt);
+                processcount++;
+                displayProgress(msg, f.Name, processcount.ToString() + " of " + bincount.ToString());
+                int cr = copy(f.FullName, tgt);
+                copycount += cr;
             }
             foreach(string s in modelBins.MPR)
             {
                 FileInfo f = findByName(s, bins);
                 string tgt = Path.Combine(projPath, s + ".img");
                 modelBins.MPRPATHS.Add(tgt);
-                bool copied = await copyFileAsync(f.FullName, tgt);
-            }
-            foreach (string s in modelBins.PRI)
-            {
-                FileInfo f = findByName(s, bins);
-                string tgt = Path.Combine(projPath, s + ".img");
-                modelBins.PRIPATHS.Add(tgt);
-                bool copied = await copyFileAsync(f.FullName, tgt);
+                processcount++;
+                displayProgress(msg, f.Name, processcount.ToString() + " of " + bincount.ToString());
+                int cr = copy(f.FullName, tgt);
+                copycount += cr;
             }
             if (!Directory.Exists(Path.Combine(projPath, "dlmode_recov")))
                 Directory.CreateDirectory(Path.Combine(projPath, "dlmode_recov"));
@@ -147,16 +136,72 @@ namespace KDZZ
                 FileInfo f = findByName(s, bins);
                 string tgt = Path.Combine(projPath, "dlmode_recov", s + ".img");
                 modelBins.DLRPATHS.Add(tgt);
-                bool copied = await copyFileAsync(f.FullName, tgt);
+                processcount++;
+                displayProgress(msg, f.Name, processcount.ToString() + " of " + bincount.ToString());
+                int cr = copy(f.FullName, tgt);
+                copycount += cr;
             }
+            foreach (string s in modelBins.PRI)
+            {
+                FileInfo f = findByName(s, bins);
+                string tgt = Path.Combine(projPath, s + ".img");
+                modelBins.PRIPATHS.Add(tgt);
+                processcount++;
+                if(f.Name == "system.img")
+                {
+                    displayProgress("    - Processing System Image (this may take several minutes. do not close console) ", f.Name, processcount.ToString() + " of " + bincount.ToString());
+                }
+                else
+                {                
+                    displayProgress(msg, f.Name, processcount.ToString() + " of " + bincount.ToString());
+                }
+                int cr = copy(f.FullName, tgt);
+                copycount += cr;
+            }
+            Console.Clear();
+            Console.Write("    - Process Complete");
             return modelBins;
         }
 
+        private static int copy(string source, string target)
+        {            
+            try
+            {
+                File.Copy(source, target, true);
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return 0;
+            }
+        }
+
+        public static async Task CopyFileAsync(string sourcePath, string destinationPath)
+        {
+            using (Stream source = File.Open(sourcePath, FileMode.Open))
+            {
+                using (Stream destination = File.Create(destinationPath))
+                {
+                    await source.CopyToAsync(destination);
+                }
+            }
+        }
 
         private static List<FileInfo> getFiles(DirectoryInfo dir)
         {
             List<FileInfo> files = new List<FileInfo>();
-            files.AddRange(dir.GetFiles("*", SearchOption.AllDirectories));
+            List<FileInfo> dirFiles = new List<FileInfo>();
+            dirFiles.AddRange(dir.GetFiles("*", SearchOption.AllDirectories));
+            foreach(FileInfo fi in dirFiles)
+            {
+                if (fi.Name.Contains("raw_resources") && !fi.Name.Contains("bak_"))
+                    files.Add(fi);
+                else if (fi.Name == "system.img")
+                    files.Add(fi);
+                else if (!fi.Name.Contains("system_") && !fi.Name.Contains("bak_"))
+                    files.Add(fi);
+            }
             return files;
         }
     }
