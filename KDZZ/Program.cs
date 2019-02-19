@@ -115,9 +115,9 @@ namespace KDZZ
             }
         }
 
-        private static void processBins(string projPath, string binsPath, ModelBins modelBins, bool useLGFE)
+        private static async void processBins(string projPath, string binsPath, ModelBins modelBins, bool useLGFE)
         {
-            ModelBins binfiles = FileTool.ProcessBins(modelBins, projPath, binsPath, useLGFE);
+            ModelBins binfiles = await FileTool.ProcessBins(modelBins, projPath, binsPath, useLGFE);
             Console.ReadKey();
         }
 

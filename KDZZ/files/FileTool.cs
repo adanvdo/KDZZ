@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace KDZZ
 {
@@ -73,12 +75,12 @@ namespace KDZZ
             return true;
         }
 
-        public static scripts.ModelBins ProcessBins(KDZZ.scripts.ModelBins modelBins, string projPath, string binsPath, bool useLGFE)
+        public static async Task<scripts.ModelBins> ProcessBins(KDZZ.scripts.ModelBins modelBins, string projPath, string binsPath, bool useLGFE)
         {
             DirectoryInfo p = new DirectoryInfo(projPath);
             DirectoryInfo b = new DirectoryInfo(binsPath);
             List<FileInfo> bins = getFiles(b);
-            return processDirectories(p.FullName, modelBins, bins);
+            return await ProcessDirectories(p.FullName, modelBins, bins);
         }
 
         public static FileInfo findByName(string binname, List<FileInfo> bins)
@@ -91,7 +93,28 @@ namespace KDZZ
             return null;
         }
 
-        private static scripts.ModelBins processDirectories(string projPath, scripts.ModelBins modelBins, List<FileInfo> bins)
+        private static async Task<bool> copyFileAsync(string filepath, string targetpath)
+        {
+            try
+            {
+                using (Stream source = File.Open(filepath, FileMode.Open))
+                {
+                    using (Stream destination = File.Create(targetpath))
+                    {
+                        await source.CopyToAsync(destination);
+                    }
+                }
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+                return false;
+            }
+        }
+
+
+        private static async Task<scripts.ModelBins> ProcessDirectories(string projPath, scripts.ModelBins modelBins, List<FileInfo> bins)
         {            
 
             if(!Directory.Exists(Path.Combine(projPath, "bootloader")))
@@ -99,28 +122,32 @@ namespace KDZZ
             foreach(string s in modelBins.BL)
             {
                 FileInfo f = findByName(s, bins);
-                modelBins.BLPATHS.Add(Path.Combine(projPath, "bootloader", s + ".img"));
-                f.CopyTo(Path.Combine(projPath, "bootloader", s + ".img"), true);
+                string tgt = Path.Combine(projPath, "bootloader", s + ".img");
+                modelBins.BLPATHS.Add(tgt);
+                bool copied = await copyFileAsync(f.FullName, tgt);
             }
             foreach(string s in modelBins.MPR)
             {
                 FileInfo f = findByName(s, bins);
-                modelBins.MPRPATHS.Add(Path.Combine(projPath, s + ".img"));
-                f.CopyTo(Path.Combine(projPath, s + ".img"), true);
+                string tgt = Path.Combine(projPath, s + ".img");
+                modelBins.MPRPATHS.Add(tgt);
+                bool copied = await copyFileAsync(f.FullName, tgt);
             }
             foreach (string s in modelBins.PRI)
             {
                 FileInfo f = findByName(s, bins);
-                modelBins.PRIPATHS.Add(Path.Combine(projPath, s + ".img"));
-                f.CopyTo(Path.Combine(projPath, s + ".img"), true);
+                string tgt = Path.Combine(projPath, s + ".img");
+                modelBins.PRIPATHS.Add(tgt);
+                bool copied = await copyFileAsync(f.FullName, tgt);
             }
             if (!Directory.Exists(Path.Combine(projPath, "dlmode_recov")))
                 Directory.CreateDirectory(Path.Combine(projPath, "dlmode_recov"));
             foreach (string s in modelBins.DLR)
             {
                 FileInfo f = findByName(s, bins);
-                modelBins.DLRPATHS.Add(Path.Combine(projPath, "dlmode_recov", s + ".img"));
-                f.CopyTo(Path.Combine(projPath, "dlmode_recov", s + ".img"), true);
+                string tgt = Path.Combine(projPath, "dlmode_recov", s + ".img");
+                modelBins.DLRPATHS.Add(tgt);
+                bool copied = await copyFileAsync(f.FullName, tgt);
             }
             return modelBins;
         }
