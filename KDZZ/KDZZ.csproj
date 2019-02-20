@@ -56,15 +56,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="files\update-binary" />
-    <None Include="firmware.json" />
+    <None Include="files\update-binary">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="firmware.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
-    <None Include="scripts\h872\extract_bl" />
-    <None Include="scripts\h872\extract_mpr" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="files\G6\" />
-    <Folder Include="files\V30\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
