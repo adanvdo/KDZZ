@@ -12,6 +12,7 @@ LG KDZ Zip Package Creation Tool - For TWRP Packages
 	
   - H872 or H932 KDZ File
   - Windows LG Firmware Extract tool
+    - [Download v1.2.6.1](https://sourceforge.net/projects/lgtools/files/KDZTools/WindowsLGFirmwareExtract_v1.2.6.1.zip/download)
 	
 ## Installation
 
