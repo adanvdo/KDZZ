@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Threading.Tasks;
 
 namespace KDZZ
@@ -9,41 +10,23 @@ namespace KDZZ
     {
         public static string project_files_path = "KDZZ_PackageFiles";
         public static string full_path = string.Empty;
-        public static Uri ProjectDir { get; set; }
+        public static string ProjectRootDir { get; set; }
 
         public static bool Init(string path)
         {
             try
             {
-                if (!Directory.Exists(path))
+                if (Directory.Exists(path))
                 {
-                    Console.WriteLine("Creating directory " + path);
-                    Directory.CreateDirectory(path);
-                }
-                DirectoryInfo dir = new DirectoryInfo(path);
-                DirectoryInfo[] subDirs = dir.GetDirectories("*", SearchOption.TopDirectoryOnly);
-                bool dirExists = false;
-                for(int i = 0; i < subDirs.Length; i++)
-                {
-                    if(subDirs[i].Name == project_files_path)
-                    { dirExists = true; full_path = subDirs[i].FullName; break; }
-                }
-                if(dirExists)
-                {
-                    NumericDialogChoice res = new NumericDialogChoice(-1, string.Empty);
-                    while (res.Choice < 0)
-                    {
-                        res = NumericDialog.ShowNumericDialog("Existing Project Folder Detected: " + project_files_path, new List<string>() { "Keep", "Reset" });
-                        Console.Clear();
-                        if (res.Choice == 2)
-                        {
-                            Directory.Delete(Path.Combine(path, project_files_path));
-                            break;
-                        }
-                    }                    
+                    Console.WriteLine("    - Existing Project Folder Detected");
+                    Console.WriteLine("    - Clearing Files..");
+                    Directory.Delete(path, true);
                 }
                 
-                Directory.CreateDirectory(Path.Combine(path, project_files_path));
+                Console.WriteLine("    - Initializing Directory.." + path);
+                Directory.CreateDirectory(path);
+                Directory.CreateDirectory(Path.Combine(path, project_files_path));               
+
                 return true;
             }
             catch(Exception ex)
@@ -95,7 +78,7 @@ namespace KDZZ
 
         private static void displayProgress(string message, string file, string progressmessage)
         {
-            Console.Write("\r{0} {1} - {2}", message, file, progressmessage);
+            Console.Write("\r{0} {1} - {2}                 ", message, file, progressmessage);
         }
 
         private static scripts.ModelBins ProcessDirectories(string projPath, scripts.ModelBins modelBins, List<FileInfo> bins)
@@ -105,6 +88,25 @@ namespace KDZZ
             int processcount = 0;
             int copycount = 0;
             string msg = "    - Processing File ";
+
+            if (!Directory.Exists(Path.Combine(projPath, "META-INF")))
+                Directory.CreateDirectory(Path.Combine(projPath, "META-INF"));
+            if (!Directory.Exists(Path.Combine(projPath, "META-INF", "com")))
+                Directory.CreateDirectory(Path.Combine(projPath, "META-INF", "com"));
+            if (!Directory.Exists(Path.Combine(projPath, "META-INF", "com", "google")))
+                Directory.CreateDirectory(Path.Combine(projPath, "META-INF", "com", "google"));
+            if (!Directory.Exists(Path.Combine(projPath, "META-INF", "com", "google", "android")))
+                Directory.CreateDirectory(Path.Combine(projPath, "META-INF", "com", "google", "android"));
+            if (!File.Exists(Path.Combine(projPath, "META-INF", "com", "google", "android", "update-binary")))
+            {
+                string binary = Path.Combine(KDZZ.Program.Root, "files", "update-binary");
+                string binarytgt = Path.Combine(projPath, "META-INF", "com", "google", "android", "update-binary");
+                int bincopied = copy(binary, binarytgt); 
+                if(bincopied < 1)
+                {
+                    KDZZ.Program.ReturnError("Unable to copy update-binary");                    
+                }
+            }
 
             if(!Directory.Exists(Path.Combine(projPath, "bootloader")))
                 Directory.CreateDirectory(Path.Combine(projPath, "bootloader"));            
@@ -119,10 +121,12 @@ namespace KDZZ
                 int cr = copy(f.FullName, tgt);
                 copycount += cr;
             }
+            if (!Directory.Exists(Path.Combine(projPath, "modem")))
+                Directory.CreateDirectory(Path.Combine(projPath, "modem"));
             foreach(string s in modelBins.MPR)
             {
                 FileInfo f = findByName(s, bins);
-                string tgt = Path.Combine(projPath, s + ".img");
+                string tgt = Path.Combine(projPath, "modem", s + ".img");
                 modelBins.MPRPATHS.Add(tgt);
                 processcount++;
                 displayProgress(msg, f.Name, processcount.ToString() + " of " + bincount.ToString());
@@ -141,10 +145,12 @@ namespace KDZZ
                 int cr = copy(f.FullName, tgt);
                 copycount += cr;
             }
+            if (!Directory.Exists(Path.Combine(projPath, "primary")))
+                Directory.CreateDirectory(Path.Combine(projPath, "primary"));
             foreach (string s in modelBins.PRI)
             {
                 FileInfo f = findByName(s, bins);
-                string tgt = Path.Combine(projPath, s + ".img");
+                string tgt = Path.Combine(projPath, "primary", s + ".img");
                 modelBins.PRIPATHS.Add(tgt);
                 processcount++;
                 if(f.Name == "system.img")
@@ -159,14 +165,14 @@ namespace KDZZ
                 copycount += cr;
             }
             Console.Clear();
-            Console.Write("    - Process Complete");
+            Console.WriteLine("    - Process Complete");
             return modelBins;
         }
 
         private static int copy(string source, string target)
         {            
             try
-            {
+            {                
                 File.Copy(source, target, true);
                 return 1;
             }
@@ -174,6 +180,24 @@ namespace KDZZ
             {
                 Console.WriteLine(ex.Message);
                 return 0;
+            }
+        }
+
+        private static bool moveDir(string source, string target)
+        {
+            try
+            {
+                if (!Directory.Exists(source))
+                    return false;
+                if (Directory.Exists(target))
+                    Directory.Delete(target, true);
+                Directory.Move(source, target);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
             }
         }
 
@@ -203,6 +227,55 @@ namespace KDZZ
                     files.Add(fi);
             }
             return files;
+        }
+
+        public static bool ArrangeFilesForPackage(KDZZ.scripts.PackageType packageType)
+        {
+            Console.WriteLine("    - Preparing Package Files...");
+            if (Directory.Exists(Path.Combine(ProjectRootDir, "package")))
+                Directory.Delete(Path.Combine(ProjectRootDir, "package"), true);
+            Directory.CreateDirectory(Path.Combine(ProjectRootDir, "package"));
+            bool movemeta = moveDir(Path.Combine(ProjectRootDir, project_files_path, "META-INF"), Path.Combine(ProjectRootDir, "package", "META-INF"));
+            if (packageType == scripts.PackageType.Bootloader)
+            {
+                bool moved = moveDir(Path.Combine(ProjectRootDir, project_files_path, "bootloader"), Path.Combine(ProjectRootDir, "package", "bootloader"));
+                return moved;
+            }
+            else if (packageType == scripts.PackageType.Modem)
+            {
+                bool moved = moveDir(Path.Combine(ProjectRootDir, project_files_path, "modem"), Path.Combine(ProjectRootDir, "package"));
+                return moved;
+            }
+            else if (packageType == scripts.PackageType.LAF)
+            {
+                bool moved = moveDir(Path.Combine(ProjectRootDir, project_files_path, "dlmode_recov"), Path.Combine(ProjectRootDir, "package"));
+                return moved;
+            }
+            else if (packageType == scripts.PackageType.FullStock)
+            {
+                bool moved = moveDir(Path.Combine(ProjectRootDir, project_files_path, "bootloader"), Path.Combine(ProjectRootDir, "package", "bootloader")) 
+                    && moveDir(Path.Combine(ProjectRootDir, project_files_path, "modem"), Path.Combine(ProjectRootDir, "package"))
+                    && moveDir(Path.Combine(ProjectRootDir, project_files_path, "primary"), Path.Combine(ProjectRootDir, "package"));
+                return moved;
+            }
+            return false;
+        }
+
+        public static string CreateZipPackage(string packageName)
+        {
+            Console.WriteLine("    - Creating Zip Package..");
+            string p = Path.Combine(ProjectRootDir, "package");
+            string zp = Path.Combine(ProjectRootDir, packageName + ".zip");
+            try
+            {
+                ZipFile.CreateFromDirectory(p, zp);
+            }
+            catch(Exception ex)
+            {
+                KDZZ.Program.ReturnError(ex.Message);
+            }
+            Console.WriteLine("    - Zip Package Created");
+            return zp;
         }
     }
 }

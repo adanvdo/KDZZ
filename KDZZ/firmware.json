@@ -33,6 +33,13 @@
       "dlmode_recov": [
         "laf",
         "recovery"
+      ],
+      "nobak": [
+        "apdp",
+        "factory",
+        "sec",
+        "boot",
+        "system"
       ]
     },
     {
@@ -68,6 +75,13 @@
       "dlmode_recov": [
         "laf",
         "recovery"
+      ],
+      "nobak": [
+        "apdp",
+        "factory",
+        "sec",
+        "boot",
+        "system"
       ]
     }
   ]

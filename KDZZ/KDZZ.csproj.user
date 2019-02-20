@@ -4,6 +4,6 @@
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>-p "c:\users\jesse\test_dir" -b "D:\Android\LG\Firmware"</StartArguments>
+    <StartArguments>-p "c:\users\jam\test_dir" -b "C:\Users\jam\h87220f"</StartArguments>
   </PropertyGroup>
 </Project>

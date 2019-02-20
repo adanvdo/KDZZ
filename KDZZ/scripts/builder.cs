@@ -11,27 +11,43 @@ namespace KDZZ.scripts
 {
     public class builder
     {
-        private static string extractBLtoTMP = "package_extract_dir(\"bootloader\", \"/tmp\");\n" +
-"set_perm_recursive(0, 0, 0777, 0777, \"/tmp\");\n" +
-"ui_print(\"Verifying Bootloader contents..\");\n";
+        private static List<string> extractBLtoTMP = new List<string>() { "package_extract_dir(\"bootloader\", \"/tmp\");", "set_perm_recursive(0, 0, 0777, 0777, \"/tmp\");" };
 
         private static string uiprint(string text)
         {
-            string s = "ui_print(\"" + text + "\");\n";
+            string s = "ui_print(\"" + text + "\");";
             return s;
         }
 
-        private static string lineExtractFile(string filePath)
+        private static List<string> lineExtractFile(string filePath, bool hasbak)
         {
             string name = Path.GetFileNameWithoutExtension(filePath);
-            string s = "package_extract_file(\"" + filePath + "\", \"/dev/block/bootdevice/by-name/" + name + "\");\n";
-            return s;
+            List<string> list = new List<string>();
+            list.Add("package_extract_file(\"" + filePath + "\", \"/dev/block/bootdevice/by-name/" + name + "\");");
+            if (hasbak) { list.Add("package_extract_file(\"" + filePath + "\", \"/dev/block/bootdevice/by-name/" + name + "bak\");"); }
+            return list;
         }
 
-        private static string titleLines(string title)
+        private static List<string> titleLines(string title)
         {
-            string t = builder.uiprint(" ") + builder.uiprint(title) + builder.uiprint(" ");
+            List<string> t = new List<string>() { builder.uiprint(" "), builder.uiprint(title), builder.uiprint(" ") };
             return t;            
+        }
+
+        private static List<string> endLines(string packagename)
+        {
+            List<string> lines = new List<string>() {
+                uiprint(" "),
+                uiprint(" "),
+                uiprint(" "),
+                uiprint("       Flash Complete      "),
+                uiprint(" "),
+                uiprint("      " + packagename + "     "),
+                uiprint(" "),
+                uiprint(" "),
+                uiprint("Done")
+            };
+            return lines;
         }
 
         public static List<string> getModels()
@@ -58,13 +74,62 @@ namespace KDZZ.scripts
             return s;
         }
 
-        public static void LoadModel(string model)
-        {             
-            ModelBins scripts = new ModelBins(model);
-            StringBuilder sbs = new StringBuilder();
-            Console.Write("Enter Package Title => ");
-            string title = Console.ReadLine();
-            sbs.Append(titleLines(title));
+        public static List<string> CreateUpdaterScript(PackageType packageType, string packageName, ModelBins modelBins)
+        {
+            Console.WriteLine("    - Building Updater-Script...");
+            List<string> sb = new List<string>();
+            sb.AddRange(titleLines("Flashing " + packageName + ".."));
+
+            if(packageType == PackageType.Bootloader)
+            {
+                // add sha1 checksum methods
+                sb.AddRange(extractBLtoTMP);
+                sb.Add(uiprint("Flashing Bootloader.."));
+                foreach(string s in modelBins.BL)
+                {
+                    sb.AddRange(lineExtractFile(@"bootloader/" + s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                }
+            }
+            else if (packageType == PackageType.Modem)
+            {
+                sb.Add(uiprint("Flashing Modem.."));
+                foreach (string s in modelBins.MPR)
+                {
+                    sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                }
+            }
+            else if (packageType == PackageType.LAF)
+            {
+                sb.Add(uiprint("Flashing LAF.."));
+                foreach (string s in modelBins.DLR)
+                {
+                    if(s == "laf")
+                        sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                }
+            }
+            else if(packageType == PackageType.FullStock)
+            {
+                sb.AddRange(extractBLtoTMP);
+                sb.Add(uiprint("Flashing Bootloader.."));
+                foreach (string s in modelBins.BL)
+                {
+                    sb.AddRange(lineExtractFile(@"bootloader/" + s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                }
+                sb.Add(uiprint("Flashing Modem.."));
+                foreach (string s in modelBins.MPR)
+                {
+                    sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                }
+                sb.Add(uiprint("Flasing Boot and System"));
+                sb.Add(uiprint("This may take a while..."));
+                foreach(string s in modelBins.PRI)
+                {
+                    sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                }
+            }
+            sb.AddRange(endLines(packageName));
+            Console.WriteLine("    - Updater Script Created");
+            return sb;
         }
     }
 
@@ -80,6 +145,7 @@ namespace KDZZ.scripts
         public List<string> MPRPATHS { get; set; }
         public List<string> DLRPATHS { get; set; }
         public List<string> PRIPATHS { get; set; }
+        public List<string> NOBAK { get; set; }
         public int BinCount { get { return (BL.Count + MPR.Count + DLR.Count + PRI.Count); } }
 
         public ModelBins(string model)
@@ -93,6 +159,8 @@ namespace KDZZ.scripts
             MPRPATHS = new List<string>();
             DLRPATHS = new List<string>();
             PRIPATHS = new List<string>();
+
+            NOBAK = new List<string>();
 
             dynamic device = getModel(model);
             if (device == null)
@@ -122,6 +190,11 @@ namespace KDZZ.scripts
                     string bin = Convert.ToString(obj);
                     DLR.Add(bin);
                 }
+                foreach(var obj in device.nobak)
+                {
+                    string bin = Convert.ToString(obj);
+                    NOBAK.Add(bin);
+                }
             }
         }
 
@@ -144,5 +217,14 @@ namespace KDZZ.scripts
             }
             return null;
         }
+    }
+
+    public enum PackageType
+    {
+        Bootloader = 0,
+        Modem = 1,
+        LAF = 2,
+        FullStock = 3,
+        Custom = 4
     }
 }
