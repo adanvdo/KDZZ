@@ -1,3 +1,4 @@
-packages
+packages/
 .vs
-KDZZ/obj
+bin/
+obj/
