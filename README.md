@@ -2,11 +2,15 @@
 
 LG KDZ Zip Package Creation Tool - For TWRP Packages
 
+## Latest Version 
+
+  [KDZZ v 1.0.0.0](https://bitbucket.org/jamgalactic/kdzz/downloads/KDZZ_1.0.0.0.zip)
+
 *Features will continue to be added/updated over time.*
 
 ## Requirements
 	
-	- H872 or H932 KDZ File
+  - H872 or H932 KDZ File
   - Windows LG Firmware Extract tool
 	
 ## Installation
