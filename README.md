@@ -31,8 +31,9 @@ LG KDZ Zip Package Creation Tool - For TWRP Packages
 #### 2. Run KDZZ
 
   - Open CMD in Windows
-  - cd to KDZZ.exe directory or type [path to KDZZ.exe] -p "[destination project directory path]" -b "[path to extracted kdz files]"
-	- example: C:\Users\JDOE\KDZZ\KDZZ.exe -p "C:\Users\JDOE\Desktop\H87220f" -b "C:\Users\JDOE\Desktop\KDZFiles"
+  - cd to KDZZ.exe directory or type 
+    - `[path to KDZZ.exe] -p "[destination project directory path]" -b "[path to extracted kdz files]"`
+	- `example: C:\Users\JDOE\KDZZ\KDZZ.exe -p "C:\Users\JDOE\Desktop\H87220f" -b "C:\Users\JDOE\Desktop\KDZFiles"`
   - Press enter to run the utility
 
 ## License
