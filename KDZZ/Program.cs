@@ -135,15 +135,13 @@ namespace KDZZ
                     pname = Console.ReadLine();
                 }
                 List<string> script = builder.CreateUpdaterScript(selectedType, pname, copied);
-                using (TextWriter file = new StreamWriter(Path.Combine(ProjectRoot, "package", "META-INF", "com", "google", "android", "updater-script")))
-                {
-                    file.NewLine = "\n";
-                    foreach(string line in script)
-                    {
-                        file.WriteLine(line);
-                    }
-                }
-                string packagepath = FileTool.CreateZipPackage(pname.Replace(" ", "_"));
+                string metadir = Path.Combine(ProjectRoot, FileTool.project_files_path, "META-INF");
+                string usdir = Path.Combine(ProjectRoot, FileTool.project_files_path, "META-INF", "com", "google", "android");
+                File.WriteAllText(Path.Combine(usdir, "updater-script"), string.Join("\n", script));
+                bool moveMeta = FileTool.MoveDir(metadir, Path.Combine(ProjectRoot, "package", "META-INF"));
+                if (!moveMeta)
+                    ReturnError("Error moving META-INF Directory");
+                string packagepath = FileTool.CreateZipPackage(pname.Replace(" ", "_"), selectedType);
                 Console.WriteLine(" ");
                 Console.WriteLine("Package Location: " + packagepath);
                 Console.WriteLine("Press any key to exit..");

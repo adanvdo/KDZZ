@@ -78,57 +78,64 @@ namespace KDZZ.scripts
         {
             Console.WriteLine("    - Building Updater-Script...");
             List<string> sb = new List<string>();
-            sb.AddRange(titleLines("Flashing " + packageName + ".."));
+            try
+            {
+                sb.AddRange(titleLines("Flashing " + packageName + ".."));
 
-            if(packageType == PackageType.Bootloader)
-            {
-                // add sha1 checksum methods
-                sb.AddRange(extractBLtoTMP);
-                sb.Add(uiprint("Flashing Bootloader.."));
-                foreach(string s in modelBins.BL)
+                if (packageType == PackageType.Bootloader)
                 {
-                    sb.AddRange(lineExtractFile(@"bootloader/" + s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                    // add sha1 checksum methods
+                    sb.AddRange(extractBLtoTMP);
+                    sb.Add(uiprint("Flashing Bootloader.."));
+                    foreach (string s in modelBins.BL)
+                    {
+                        sb.AddRange(lineExtractFile(@"bootloader/" + s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                    }
                 }
-            }
-            else if (packageType == PackageType.Modem)
-            {
-                sb.Add(uiprint("Flashing Modem.."));
-                foreach (string s in modelBins.MPR)
+                else if (packageType == PackageType.Modem)
                 {
-                    sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
-                }
-            }
-            else if (packageType == PackageType.LAF)
-            {
-                sb.Add(uiprint("Flashing LAF.."));
-                foreach (string s in modelBins.DLR)
-                {
-                    if(s == "laf")
+                    sb.Add(uiprint("Flashing Modem.."));
+                    foreach (string s in modelBins.MPR)
+                    {
                         sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                    }
                 }
+                else if (packageType == PackageType.LAF)
+                {
+                    sb.Add(uiprint("Flashing LAF.."));
+                    foreach (string s in modelBins.DLR)
+                    {
+                        if (s == "laf")
+                            sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                    }
+                }
+                else if (packageType == PackageType.FullStock)
+                {
+                    sb.AddRange(extractBLtoTMP);
+                    sb.Add(uiprint("Flashing Bootloader.."));
+                    foreach (string s in modelBins.BL)
+                    {
+                        sb.AddRange(lineExtractFile(@"bootloader/" + s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                    }
+                    sb.Add(uiprint("Flashing Modem.."));
+                    foreach (string s in modelBins.MPR)
+                    {
+                        sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                    }
+                    sb.Add(uiprint("Flasing Boot and System"));
+                    sb.Add(uiprint("This may take a while..."));
+                    foreach (string s in modelBins.PRI)
+                    {
+                        sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
+                    }
+                }
+                sb.AddRange(endLines(packageName));
+                Console.WriteLine("    - Updater Script Created");
             }
-            else if(packageType == PackageType.FullStock)
+            catch(Exception ex)
             {
-                sb.AddRange(extractBLtoTMP);
-                sb.Add(uiprint("Flashing Bootloader.."));
-                foreach (string s in modelBins.BL)
-                {
-                    sb.AddRange(lineExtractFile(@"bootloader/" + s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
-                }
-                sb.Add(uiprint("Flashing Modem.."));
-                foreach (string s in modelBins.MPR)
-                {
-                    sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
-                }
-                sb.Add(uiprint("Flasing Boot and System"));
-                sb.Add(uiprint("This may take a while..."));
-                foreach(string s in modelBins.PRI)
-                {
-                    sb.AddRange(lineExtractFile(s + ".img", modelBins.NOBAK.IndexOf(s) < 0 ? true : false));
-                }
+                KDZZ.Program.ReturnError(ex.Message);
             }
-            sb.AddRange(endLines(packageName));
-            Console.WriteLine("    - Updater Script Created");
             return sb;
         }
     }
@@ -224,7 +231,6 @@ namespace KDZZ.scripts
         Bootloader = 0,
         Modem = 1,
         LAF = 2,
-        FullStock = 3,
-        Custom = 4
+        FullStock = 3
     }
 }

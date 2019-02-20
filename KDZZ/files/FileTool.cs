@@ -183,21 +183,83 @@ namespace KDZZ
             }
         }
 
-        private static bool moveDir(string source, string target)
+        public static bool MoveDirContents(string source, string target)
         {
+            if (!Directory.Exists(source) || !Directory.Exists(target))
+                return false;
+            DirectoryInfo di = new DirectoryInfo(source);
+            List<FileInfo> files = new List<FileInfo>();
+            files.AddRange(di.GetFiles());
+            int moved = 0;
+            foreach(FileInfo f in files)
+            {
+                f.MoveTo(Path.Combine(target, f.Name));
+                moved++;
+            }
+            return moved == files.Count;
+        }
+
+        public static bool MoveDir(string source, string target)
+        {
+
             try
             {
                 if (!Directory.Exists(source))
                     return false;
                 if (Directory.Exists(target))
                     Directory.Delete(target, true);
-                Directory.Move(source, target);
+                try
+                {
+                    Directory.Move(source, target);
+                }
+                catch(Exception ex)
+                {
+                    DirectoryCopy(source, target, true);                    
+                }
                 return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return false;
+            }
+        }
+
+        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            // If the destination directory doesn't exist, create it.
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, false);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location.
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
+                }
             }
         }
 
@@ -235,35 +297,36 @@ namespace KDZZ
             if (Directory.Exists(Path.Combine(ProjectRootDir, "package")))
                 Directory.Delete(Path.Combine(ProjectRootDir, "package"), true);
             Directory.CreateDirectory(Path.Combine(ProjectRootDir, "package"));
-            bool movemeta = moveDir(Path.Combine(ProjectRootDir, project_files_path, "META-INF"), Path.Combine(ProjectRootDir, "package", "META-INF"));
             if (packageType == scripts.PackageType.Bootloader)
             {
-                bool moved = moveDir(Path.Combine(ProjectRootDir, project_files_path, "bootloader"), Path.Combine(ProjectRootDir, "package", "bootloader"));
+                bool moved = MoveDir(Path.Combine(ProjectRootDir, project_files_path, "bootloader"), Path.Combine(ProjectRootDir, "package", "bootloader"));
                 return moved;
             }
             else if (packageType == scripts.PackageType.Modem)
             {
-                bool moved = moveDir(Path.Combine(ProjectRootDir, project_files_path, "modem"), Path.Combine(ProjectRootDir, "package"));
+                bool moved = MoveDirContents(Path.Combine(ProjectRootDir, project_files_path, "modem"), Path.Combine(ProjectRootDir, "package"));
                 return moved;
             }
             else if (packageType == scripts.PackageType.LAF)
             {
-                bool moved = moveDir(Path.Combine(ProjectRootDir, project_files_path, "dlmode_recov"), Path.Combine(ProjectRootDir, "package"));
+                bool moved = MoveDirContents(Path.Combine(ProjectRootDir, project_files_path, "dlmode_recov"), Path.Combine(ProjectRootDir, "package"));
                 return moved;
             }
             else if (packageType == scripts.PackageType.FullStock)
             {
-                bool moved = moveDir(Path.Combine(ProjectRootDir, project_files_path, "bootloader"), Path.Combine(ProjectRootDir, "package", "bootloader")) 
-                    && moveDir(Path.Combine(ProjectRootDir, project_files_path, "modem"), Path.Combine(ProjectRootDir, "package"))
-                    && moveDir(Path.Combine(ProjectRootDir, project_files_path, "primary"), Path.Combine(ProjectRootDir, "package"));
-                return moved;
+                bool bl = MoveDir(Path.Combine(ProjectRootDir, project_files_path, "bootloader"), Path.Combine(ProjectRootDir, "package", "bootloader"));
+                bool md = MoveDirContents(Path.Combine(ProjectRootDir, project_files_path, "modem"), Path.Combine(ProjectRootDir, "package"));
+                bool pr = MoveDirContents(Path.Combine(ProjectRootDir, project_files_path, "primary"), Path.Combine(ProjectRootDir, "package"));
+                return bl && md && pr;
             }
             return false;
         }
 
-        public static string CreateZipPackage(string packageName)
+        public static string CreateZipPackage(string packageName, scripts.PackageType packageType)
         {
-            Console.WriteLine("    - Creating Zip Package..");
+            Console.WriteLine("    - Creating Zip Package...");
+            if (packageType == scripts.PackageType.FullStock)
+                Console.WriteLine("    - This will take several minutes. Please do not close this window.");
             string p = Path.Combine(ProjectRootDir, "package");
             string zp = Path.Combine(ProjectRootDir, packageName + ".zip");
             try
