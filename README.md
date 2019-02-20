@@ -4,7 +4,7 @@ LG KDZ Zip Package Creation Tool - For TWRP Packages
 
 ## Latest Version 
 
-  Download Now: [KDZZ v 1.0.0.1](https://github.com/adanvdo/KDZZ/releases)
+  Download Now: [KDZZ v 1.0.0.2](https://github.com/adanvdo/KDZZ/releases)
 
 *Features will continue to be added/updated over time.*
 
