@@ -56,7 +56,7 @@ namespace KDZZ
             return true;
         }
 
-        public static scripts.ModelBins ProcessBins(KDZZ.scripts.ModelBins modelBins, string projPath, string binsPath)
+        public static ModelBins ProcessBins(KDZZ.ModelBins modelBins, string projPath, string binsPath)
         {
             DirectoryInfo p = new DirectoryInfo(projPath);
             DirectoryInfo b = new DirectoryInfo(binsPath);
@@ -81,7 +81,7 @@ namespace KDZZ
             Console.Write("\r{0} {1} - {2}                 ", message, file, progressmessage);
         }
 
-        private static scripts.ModelBins ProcessDirectories(string projPath, scripts.ModelBins modelBins, List<FileInfo> bins)
+        private static ModelBins ProcessDirectories(string projPath, ModelBins modelBins, List<FileInfo> bins)
         {
             int bincount = modelBins.BinCount;
             int filecount = bins.Count;
@@ -291,28 +291,28 @@ namespace KDZZ
             return files;
         }
 
-        public static bool ArrangeFilesForPackage(KDZZ.scripts.PackageType packageType)
+        public static bool ArrangeFilesForPackage(PackageType packageType)
         {
             Console.WriteLine("    - Preparing Package Files...");
             if (Directory.Exists(Path.Combine(ProjectRootDir, "package")))
                 Directory.Delete(Path.Combine(ProjectRootDir, "package"), true);
             Directory.CreateDirectory(Path.Combine(ProjectRootDir, "package"));
-            if (packageType == scripts.PackageType.Bootloader)
+            if (packageType == PackageType.Bootloader)
             {
                 bool moved = MoveDir(Path.Combine(ProjectRootDir, project_files_path, "bootloader"), Path.Combine(ProjectRootDir, "package", "bootloader"));
                 return moved;
             }
-            else if (packageType == scripts.PackageType.Modem)
+            else if (packageType == PackageType.Modem)
             {
                 bool moved = MoveDirContents(Path.Combine(ProjectRootDir, project_files_path, "modem"), Path.Combine(ProjectRootDir, "package"));
                 return moved;
             }
-            else if (packageType == scripts.PackageType.LAF)
+            else if (packageType == PackageType.LAF)
             {
                 bool moved = MoveDirContents(Path.Combine(ProjectRootDir, project_files_path, "dlmode_recov"), Path.Combine(ProjectRootDir, "package"));
                 return moved;
             }
-            else if (packageType == scripts.PackageType.FullStock)
+            else if (packageType == PackageType.FullStock)
             {
                 bool bl = MoveDir(Path.Combine(ProjectRootDir, project_files_path, "bootloader"), Path.Combine(ProjectRootDir, "package", "bootloader"));
                 bool md = MoveDirContents(Path.Combine(ProjectRootDir, project_files_path, "modem"), Path.Combine(ProjectRootDir, "package"));
@@ -322,10 +322,10 @@ namespace KDZZ
             return false;
         }
 
-        public static string CreateZipPackage(string packageName, scripts.PackageType packageType)
+        public static string CreateZipPackage(string packageName, PackageType packageType)
         {
             Console.WriteLine("    - Creating Zip Package...");
-            if (packageType == scripts.PackageType.FullStock)
+            if (packageType == PackageType.FullStock)
                 Console.WriteLine("    - This will take several minutes. Please do not close this window.");
             string p = Path.Combine(ProjectRootDir, "package");
             string zp = Path.Combine(ProjectRootDir, packageName + ".zip");

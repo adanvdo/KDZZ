@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
-using KDZZ.scripts;
 
 namespace KDZZ
 {
@@ -87,7 +86,7 @@ namespace KDZZ
                 res = NumericDialog.ShowNumericDialog("Please verify KDZ has been extracted to: " + binsPath, new List<string>() { "Continue", "Quit" });
                 Console.Clear();
                 if (res.Choice == 2) { Environment.Exit(0); }
-                List<string> models = builder.getModels();
+                List<string> models = ScriptBuilder.getModels();
                 NumericDialogChoice response = NumericDialog.ShowNumericDialog("Select Device Model", models);
                 Console.Clear();
                 Console.WriteLine("    - Selected: " + response.Description);
@@ -134,7 +133,7 @@ namespace KDZZ
                     Console.Write(" => ");
                     pname = Console.ReadLine();
                 }
-                List<string> script = builder.CreateUpdaterScript(selectedType, pname, copied);
+                List<string> script = ScriptBuilder.CreateUpdaterScript(selectedType, pname, copied);
                 string metadir = Path.Combine(ProjectRoot, FileTool.project_files_path, "META-INF");
                 string usdir = Path.Combine(ProjectRoot, FileTool.project_files_path, "META-INF", "com", "google", "android");
                 File.WriteAllText(Path.Combine(usdir, "updater-script"), string.Join("\n", script));

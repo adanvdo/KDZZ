@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace KDZZ.scripts
+namespace KDZZ
 {
-    public class builder
+    public class ScriptBuilder
     {
         private static List<string> extractBLtoTMP = new List<string>() { "package_extract_dir(\"bootloader\", \"/tmp\");", "set_perm_recursive(0, 0, 0777, 0777, \"/tmp\");" };
 
@@ -30,7 +30,7 @@ namespace KDZZ.scripts
 
         private static List<string> titleLines(string title)
         {
-            List<string> t = new List<string>() { builder.uiprint(" "), builder.uiprint(title), builder.uiprint(" ") };
+            List<string> t = new List<string>() { ScriptBuilder.uiprint(" "), ScriptBuilder.uiprint(title), ScriptBuilder.uiprint(" ") };
             return t;            
         }
 
